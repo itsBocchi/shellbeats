@@ -8,10 +8,12 @@ https://shellbeats.com
 **We are looking for 12 betatester on surikata.app PlayStore App, if you are interested please sign-in and contact me on SurikataNews Guild!**
 
 ## Updates
+**ShellbeatsNG is now available: a graphical version that does not require using the terminal or compiling the software, for both Windows and Mac users.**
 
-I apologize for the absence I've been pouring every minute of my free time into the countless requests from users asking for "more tools like shellbeats." I'm about to officially go live with [surikata.app](https://surikata.app): it's a bit like what I always imagined the internet could be without the influence of big corps and marketing. It's a community built around maximum creative freedom and privacy. Through Surikata you can generate a token and keep a copy of your playlists, sync multiple PCs with the same playlists, and import (add-only) playlists shared by other users. To everyone who has appreciated shellbeats, I'm asking you to help me bring surikata.app to life we've submitted for publication on the App Store and Play Store, fingers crossed they approve us!
+<img src="shellbeatsng.webp" alt="SHELLBEATS-NG" width="50%">
 
-Previously: sorry for the delay on Unicode support doing it properly would require an additional dependency I'd prefer to avoid. I kindly ask for your patience on that front.
+You can download it here 
+[![Shellbeats NG Windows and OSX Version]](https://surikata.app/g/9fa4af84829f)
 
 **v0.7**
 - Fixed **pause state desync**: switching playlist and starting a new song while paused no longer causes inverted pause/play state. mpv is now explicitly unpaused on every `loadfile`.
@@ -248,6 +250,7 @@ Sync is additive-only importing or pulling never removes your existing songs.
 - `ncurses` - terminal UI
 - `pthread` - background downloads
 - `curl` or `wget` - needed for yt-dlp auto-update (at least one must be installed)
+- `deno` or `node` - **recommended**: JavaScript runtime needed by yt-dlp to solve YouTube's anti-bot challenges (see below)
 
 ### yt-dlp auto-update
 
@@ -259,17 +262,43 @@ shellbeats manages its own local copy of yt-dlp independently from the system on
 
 When running commands (search, download, streaming), shellbeats uses the local binary if available, otherwise falls back to the system `yt-dlp`. This means the system-installed `yt-dlp` package is only needed as a safety net, shellbeats will keep itself up to date automatically as long as `curl` or `wget` is present.
 
+### JavaScript runtime for yt-dlp
+
+YouTube uses anti-bot challenges that yt-dlp needs a JavaScript runtime to solve. Without one, some videos will fail with "This video is not available" while others work fine (it depends on which YouTube API path yt-dlp falls back to).
+
+**Install deno** (recommended, enabled by default in yt-dlp):
+```bash
+curl -fsSL https://deno.land/install.sh | sh
+```
+
+Alternatively, `node` (via nvm or system package) or `bun` also work. See the [yt-dlp EJS wiki](https://github.com/yt-dlp/yt-dlp/wiki/EJS) for details.
+
+shellbeats automatically adds common install locations (`~/.deno/bin`, nvm paths, `~/.local/bin`) to PATH at startup, so runtimes installed in user-local directories will be found by yt-dlp even if they're not in the system PATH.
+
 ## Setup
+
+### openSUSE Tumbleweed
+The package is officially available in the Tumbleweed repositories. You can install it directly via `zypper`:
+
+```bash
+sudo zypper in shellbeats
+```
 
 Install dependencies:
 
 ### Debian/Ubuntu
 ```bash
 sudo apt install mpv libncurses-dev libcurl4-openssl-dev libcjson-dev yt-dlp curl
+curl -fsSL https://deno.land/install.sh | sh
 ```
 ### Arch
 ```bash
-sudo pacman -S mpv ncurses curl cjson yt-dlp
+sudo pacman -S mpv ncurses curl cjson yt-dlp deno
+```
+### Fedora/RHEL/CentOS
+```bash
+sudo dnf install mpv ncurses-devel libcurl-devel cJSON-devel yt-dlp curl
+curl -fsSL https://deno.land/install.sh | sh
 ```
 ### Fedora/RHEL/CentOS
 ```bash
@@ -277,7 +306,7 @@ sudo dnf install mpv ncurses-devel libcurl-devel cJSON-devel yt-dlp curl
 ```
 ### macOS (via [Homebrew](https://brew.sh/))
 ```bash
-brew install mpv yt-dlp cjson curl
+brew install mpv yt-dlp cjson curl deno
 ```
 > Note: macOS setup has not been personally tested by the author, but the community confirms there are no compilation issues. ncurses is included with Xcode Command Line Tools.
 
@@ -310,6 +339,7 @@ All shortcuts are visible in the header when you run shellbeats. Here's the comp
 | `p` | Previous track |
 | `x` | Stop playback |
 | `R` | Toggle shuffle mode |
+| `L` | Cycle repeat mode (OFF/ALL/ONE) |
 | `Left/Right` | Seek backward/forward |
 | `t` | Jump to time (mm:ss) |
 | `q` | Quit |
@@ -360,6 +390,7 @@ All shortcuts are visible in the header when you run shellbeats. Here's the comp
 | Seek Step | Seconds to skip with Left/Right keys (default: 10) |
 | Remember Session | Restore last search/playlist on startup |
 | Shuffle Mode | Randomize playback order |
+| Repeat Mode | Playback repeat state: OFF, ALL, or ONE |
 
 ## Features
 
@@ -368,6 +399,7 @@ All shortcuts are visible in the header when you run shellbeats. Here's the comp
 - **Background Downloads**: Keep using the app while downloads run
 - **YouTube Playlists**: Import entire playlists for streaming or download
 - **Shuffle Mode**: Randomize playback with infinite loop, shows `[SHUFFLE]` indicator
+- **Repeat Mode**: `ALL` loops queue/playlist, `ONE` repeats current track, shows `[REPEAT:*]`
 - **Seek Controls**: Jump forward/backward by configurable seconds, or to specific time
 - **Session Memory**: Optionally restore your last search or playlist on startup
 - **SuriSync**: Cloud sync playlists to your Surikata account
